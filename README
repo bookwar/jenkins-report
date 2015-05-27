@@ -1,0 +1,6 @@
+Dependencies
+------------
+
+::
+
+    gcc-c++ libpng-devel freetype-devel
