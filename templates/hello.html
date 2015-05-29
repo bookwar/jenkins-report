@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}
+Hello
+{% endblock %}
+{% block content %}
+<h1>Hello</h1>
+
+ <ul>
+  {% for dbname, dbdata in config.DB.iteritems() %}
+    <li>{{ dbdata.description }} {% if dbdata.source.url %}(<a href="{{ dbdata.source.url }}">link</a>){% endif %}
+      <ul>
+	<li><a href="/db/{{ dbname }}/graph">graph</a></li>
+	<li><a href="/db/{{ dbname }}/builds">builds</a></li>
+      </ul>
+    </li>
+  {% endfor %}
+ </ul>
+
+{% endblock %}

@@ -1,4 +1,4 @@
 requests
 Flask
-matplotlib
 dataset
+bokeh

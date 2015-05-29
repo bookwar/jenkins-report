@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block custom_head %}
+<link
+    href="/static/css/bokeh.min.css"
+    rel="stylesheet" type="text/css">
+<script src="/static/js/bokeh.min.js"></script>
+  {% endblock %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+{{ graph|safe }}
+{% endblock %}

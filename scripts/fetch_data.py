@@ -8,7 +8,7 @@ def fetch_builds_data(jenkins_url):
 
     JENKINS_URL/api/json?
       tree=jobs[name,builds[number,result,duration,builtOn,id,timestamp,fullDisplayName]]
-    
+
     Return builds_data dictionary with following schema::
 
      [
@@ -19,6 +19,7 @@ def fetch_builds_data(jenkins_url):
                        "duration" : <build_duration>,
                        "timestamp" : <build_timestamp>,
                        "id" : <build_id>,
+                       "url" : <build_url>,
                        "number" : <build_number>,
                        "result" : <build_result>,
                        "builtOn" : <node>,
@@ -33,9 +34,10 @@ def fetch_builds_data(jenkins_url):
     '''
 
     params = {}
-    params['tree'] = 'jobs[name,builds[number,result,duration,builtOn,id,timestamp,fullDisplayName]]'
+    params['tree'] = 'jobs[name,builds[number,url,result,duration,builtOn,id,timestamp,fullDisplayName]]'
     r = requests.get(
         "%s/api/json" % jenkins_url,
+        verify=False,
         params=params
     )
     builds_data = json.loads(r.text)["jobs"]
@@ -58,9 +60,9 @@ def store_builds_data(builds_data, dbname):
        fullDisplayName = check_shell #113
 
     '''
-    
+
     db = dataset.connect('sqlite:///%s' % dbname)
-    
+
     table = db.get_table('builds', primary_id='index')
 
     db.begin()
@@ -74,7 +76,7 @@ def store_builds_data(builds_data, dbname):
             build['name'] = job_entry['name']
             table.upsert(build, ['name','number'])
     db.commit()
-    
+
     return len(db['builds'])
 
 def update_builds_db(dbname, source_file=None, source_url=None):
@@ -88,7 +90,21 @@ def update_builds_db(dbname, source_file=None, source_url=None):
         raise ValueError("No URL and no source file specified")
 
     return store_builds_data(builds_data, dbname)
-    
+
+def update_db(dbname, source):
+
+    source_file = source.get('file')
+    source_url = source.get('url')
+
+    if source_file:
+        with open(source_file, 'r') as f:
+            builds_data = json.loads(f.readline())['jobs']
+    elif source_url:
+        builds_data = fetch_builds_data(source_url)
+    else:
+        raise ValueError("No URL and no source file specified")
+
+    return store_builds_data(builds_data, dbname)
+
 if __name__ == '__main__':
     update_builds_db(source_file='test.data', dbname='test.db')
-
