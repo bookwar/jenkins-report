@@ -18,7 +18,7 @@ def get_build_color(build_data):
     elif result == 'FAILURE':
         return 'red'
     elif result == 'UNSTABLE':
-        return 'yellow'
+        return 'gold'
     elif result == 'ABORTED':
         return 'gray'
     else:
@@ -46,7 +46,8 @@ def figure_as_html(builds_data, nodes, title):
     # angle = pi/3, height_units="screen")
 
     hover = p.select(dict(type=HoverTool))
-    hover.tooltips = "@label"
+
+    hover.tooltips = '<font color="@color">&bull;</font> @label'
 
     center_x = []
     center_y = []
@@ -86,11 +87,11 @@ def figure_as_html(builds_data, nodes, title):
             x=center_x,
             y=center_y,
             width=width,
-            c=color,
+            color=color,
             label=label,
         )
     )
-    p.rect('x', 'y', 'width', height, color='c', source=source, line_color=None, fill_alpha=0.4)
+    p.rect('x', 'y', 'width', height, color='color', source=source, line_color=None, fill_alpha=0.4)
 
     script, div = components(p)
     return script + div
