@@ -2,36 +2,12 @@ from bokeh.plotting import figure, ColumnDataSource
 from bokeh.embed import components
 from bokeh.models import HoverTool
 
-#from bokeh.objects import DatetimeTickFormatter
-
 import logging
 
 from datetimeutils import *
 
 
 logger = logging.getLogger(__name__)
-
-# def set_hourly_x_ticks(plt):
-#     '''Set X-Axis to show hours'''
-#     xmin, xmax = plt.xlim()
-#     logger.debug("xmin: %s %s" % (xmin, datetime_from_timestamp(xmin)))
-
-#     ceiling_xmin = datetime_from_timestamp(xmin).replace(
-#         minute=0,
-#         second=0,
-#         microsecond=0
-#     ) + datetime.timedelta(hours=1)
-#     logger.debug("ceiling_xmin: %s" % ceiling_xmin)
-
-#     ceiling_xmin_timestamp = datetime_to_timestamp(ceiling_xmin)
-#     logger.debug("ceiling_xmin_timestamp: %s" % ceiling_xmin_timestamp)
-
-#     x_ticks = xrange(int(ceiling_xmin_timestamp), int(xmax), 1000*60*60)
-#     plt.xticks(
-#         x_ticks,
-#         map(lambda dt: datetime_from_timestamp(dt).strftime("%H:%M"), x_ticks),
-#         rotation='vertical',
-#     )
 
 def get_build_color(build_data):
 
@@ -49,10 +25,10 @@ def get_build_color(build_data):
         return 'blue'
 
 def figure_as_html(builds_data, nodes, title):
-    ''' For every build in builds_data draw rectangle we define
+    ''' For every build in builds_data draw rectangle with data:
 
     :center_x: = left(=timestamp) + width/2
-    :center y: = bottom(=node_index*11) + height/2
+    :center y: = builtOn
     :width: = duration
     :height: = 100
     :color: = result_to_color(result)
@@ -101,7 +77,6 @@ def figure_as_html(builds_data, nodes, title):
         width.append(build_width)
         label.append(build_label)
         center_x.append(build_left + build_width/2)
-        #        center_y.append(build_bottom + height/2)
         center_y.append(build_data['builtOn'])
         color.append(build_color)
 
@@ -116,38 +91,6 @@ def figure_as_html(builds_data, nodes, title):
         )
     )
     p.rect('x', 'y', 'width', height, color='c', source=source, line_color=None, fill_alpha=0.4)
-    #    p.xaxis[0].formatter = DatetimeTickFormatter()
 
     script, div = components(p)
     return script + div
-
-
-    # plt.barh(bottom, width, height, left, color=color, alpha=0.2, linewidth=0.1)
-    # plt.yticks(
-    #     xrange(5, len(nodes)*11, 11),
-    #     map(lambda node: node.replace("mirantis.net",".."), nodes),
-    #     fontsize=6,
-    # )
-
-    # set_hourly_x_ticks(plt)
-
-    # plt.xlabel('Time')
-    # plt.title(title)
-
-    # # Set labels for every bar
-    # counters = [0] * len(nodes)
-    # # for i in xrange(len(names)):
-    # #     l, b, name = left[i], bottom[i], names[i]
-    # #     plt.text(
-    # #         l + 50000,
-    # #         b + 3*counters[b/11],
-    # #         name,
-    # #         horizontalalignment='left',
-    # #         verticalalignment='bottom',
-    # #         fontsize=4,
-    # #         rotation=10,
-    # #     )
-    # #     counters[b/11] = (counters[b/11] + 1) % 3
-
-    # plt.savefig('test.png')
-    # return plt
