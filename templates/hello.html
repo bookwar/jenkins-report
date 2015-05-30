@@ -3,11 +3,13 @@
 Hello
 {% endblock %}
 {% block content %}
+<div class="page-header">
 <h1>Hello</h1>
+</div>
 
  <ul>
   {% for dbname, dbdata in config.DB.iteritems() %}
-    <li>{{ dbdata.description }} {% if dbdata.source.url %}(<a href="{{ dbdata.source.url }}">link</a>){% endif %}
+    <li>{{ dbdata.description }} {% if dbdata.source.url %}(<a href="{{ dbdata.source.url }}">link</a>){% endif %} - {{ last.get(dbname)|ts_to_time }}
       <ul>
 	<li><a href="/db/{{ dbname }}/graph">graph</a></li>
 	<li><a href="/db/{{ dbname }}/builds">builds</a></li>

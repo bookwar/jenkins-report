@@ -1,0 +1,22 @@
+<div class="table-responsive">
+<table class="table table-hover table-bordered table-condensed">
+  <tr>
+    <th>Timestamp</th>
+    <th>Name</th>
+    <th>Number</th>
+    <th>Node</th>
+    <th>Result</th>
+    <th>Link</th>
+  </tr>
+  {% for build in builds %}
+  <tr>
+    <td>{{build.timestamp|ts_to_time}}</td>
+    <td>{{build.name}}</td>
+    <td>{{build.number}}</td>
+    <td>{{build.builtOn}}</td>
+    <td>{{build.result}}</td>
+    <td>(<a href="{{build.url}}">link</a>)</td>
+  </tr>
+  {% endfor %}
+</table>
+</div>

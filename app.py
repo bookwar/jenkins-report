@@ -3,6 +3,7 @@ import logging
 import report
 import scripts
 
+
 app = flask.Flask(__name__)
 
 app.config.from_object('config')
@@ -22,7 +23,8 @@ if not app.debug:
 
 @app.route('/')
 def hello_world():
-    return flask.render_template('hello.html')
+    last_builds = report.get_last_builds(app.config['DB'])
+    return flask.render_template('hello.html', last=last_builds)
 
 @app.route('/db/<db_name>/builds')
 def show_builds_from_db(db_name):
@@ -58,8 +60,41 @@ def update_db(db_name):
 
     return flask.render_template('page.html', title=title, content=content)
 
-##########################################################
+@app.route('/ds/<db_name>/<job>')
+@app.route('/ds/<db_name>/<job>/<int:number>')
+def show_downstream(db_name, job, number='lastBuild'):
 
+    builds = report.jenkins.list_downstream(
+        app.config['DB'][db_name]['source']['url'],
+        job,
+         number,
+        )
+    builds_data = []
+    for build in builds:
+        builds_data += report.get_builds(
+            app.config['DB'][db_name]['filename'],
+            limit=1,
+            name=build[0],
+            number=build[1],
+        )
+    graph = report.graph_bokeh.figure_as_html(
+        builds_data,
+        title="Builds for %s #%s" % builds[0],
+    )
+
+    return flask.render_template('graph_and_builds.html',
+                                 builds=builds_data,
+                                 graph=graph,
+    )
+
+
+# Filters ################################################
+
+@app.template_filter('ts_to_time')
+def _jinja2_filter_datetime(timestamp, fmt=None):
+    if timestamp:
+        dt = report.datetimeutils.datetime_from_timestamp(timestamp)
+        return str(dt)
 
 if __name__ == '__main__':
     app.run(debug=True)

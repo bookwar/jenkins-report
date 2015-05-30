@@ -53,7 +53,7 @@ def figure_as_html(builds_data, nodes=None, title=None, with_labels=False):
 
         build_left = build_data['timestamp']
 
-        if build_data['duration'] == 0:
+        if build_data['duration'] == 0 and not build_data['result']:
             logger.debug("Build %s is still running" % build_data['fullDisplayName'])
             duration = max_time - build_data['timestamp']
             build_width = duration
@@ -99,12 +99,24 @@ def figure_as_html(builds_data, nodes=None, title=None, with_labels=False):
     hover.tooltips = '<font color="@color">&bull;</font> @label'
 
     # Draw data
-    p.rect('x', 'y', 'width', height, color='color', source=source, line_color=None, fill_alpha=0.4)
+    p.rect('x', 'y', 'width', height, color='color', source=source,
+           line_width=1,
+           line_color='white',
+           line_alpha=0.4,
+           fill_alpha=0.4,
+    )
+
     if with_labels:
         # Add labels layer
-        p.text('left', 'y', 'label', color='color', source=source,
-               angle=0.2,
+        p.text('left', 'y', 'label',
+               source=source,
+               angle=0.3,
                name="Labels",
+               text_font_size='6pt',
+               text_baseline='middle',
+               text_alpha=0.8,
+               x_offset=map(lambda x: x % 3 * 20, xrange(len(label))),
+               y_offset=map(lambda y: y % 2 * 10 -5 , xrange(len(label))),
         )
 
     # To HTML

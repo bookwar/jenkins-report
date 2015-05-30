@@ -4,7 +4,7 @@
     href="/static/css/bokeh.min.css"
     rel="stylesheet" type="text/css">
 <script src="/static/js/bokeh.min.js"></script>
-{% endblock %}
+  {% endblock %}
 {% block title %}
 {{ title }}
 {% endblock %}
@@ -12,4 +12,6 @@
 <h1>{{ title }}</h1>
 
 {{ graph|safe }}
+
+{% include 'include/builds.html' %}
 {% endblock %}
