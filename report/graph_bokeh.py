@@ -1,4 +1,5 @@
 from bokeh.plotting import figure, ColumnDataSource
+from bokeh.io import vform
 from bokeh.embed import components
 from bokeh.models import HoverTool
 
@@ -24,7 +25,7 @@ def get_build_color(build_data):
     else:
         return 'blue'
 
-def figure_as_html(builds_data, nodes, title):
+def figure_as_html(builds_data, nodes=None, title=None, with_labels=False):
     ''' For every build in builds_data draw rectangle with data:
 
     :center_x: = left(=timestamp) + width/2
@@ -35,23 +36,12 @@ def figure_as_html(builds_data, nodes, title):
     :label: = fullDisplayName
     '''
 
-    TOOLS="pan,xwheel_zoom,box_zoom,reset,previewsave,hover"
-
-    p = figure(x_axis_type="datetime", y_range=nodes, width=900,
-               tools=TOOLS,
-               title=title,
-               toolbar_location="below"
-    )
-    # p.rect(x=[1, 2, 3], y=[1, 2, 3], width=0.2, height=40, color="#CAB2D6",
-    # angle = pi/3, height_units="screen")
-
-    hover = p.select(dict(type=HoverTool))
-
-    hover.tooltips = '<font color="@color">&bull;</font> @label'
+    # Data
 
     center_x = []
     center_y = []
     width = []
+    left = []
     height = 0.95
     label = []
     color = []
@@ -70,11 +60,10 @@ def figure_as_html(builds_data, nodes, title):
         else:
             build_width = build_data['duration']
 
-        build_bottom = nodes.index(build_data['builtOn']) * 105
         build_label = build_data['fullDisplayName']
-
         build_color = get_build_color(build_data)
 
+        left.append(build_left)
         width.append(build_width)
         label.append(build_label)
         center_x.append(build_left + build_width/2)
@@ -87,11 +76,38 @@ def figure_as_html(builds_data, nodes, title):
             x=center_x,
             y=center_y,
             width=width,
+            left=left,
             color=color,
             label=label,
         )
     )
+
+    if not nodes:
+        nodes = sorted(list(set(center_y)))
+
+    # Plot properties
+
+    TOOLS="pan,xwheel_zoom,box_zoom,reset,previewsave,hover,resize"
+
+    p = figure(x_axis_type="datetime", y_range=nodes, width=900,
+               tools=TOOLS,
+               title=title,
+               toolbar_location="below"
+    )
+
+    hover = p.select(dict(type=HoverTool))
+    hover.tooltips = '<font color="@color">&bull;</font> @label'
+
+    # Draw data
     p.rect('x', 'y', 'width', height, color='color', source=source, line_color=None, fill_alpha=0.4)
+    if with_labels:
+        # Add labels layer
+        p.text('left', 'y', 'label', color='color', source=source,
+               angle=0.2,
+               name="Labels",
+        )
+
+    # To HTML
 
     script, div = components(p)
     return script + div

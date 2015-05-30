@@ -17,13 +17,5 @@ def get_graph(dbname):
     table = db.load_table('builds')
 
     builds = table.find(order_by='-timestamp', _limit=5000)
-    builds_data = [item for item in builds]
-    nodes = sorted(
-        list(
-            set(
-                [item['builtOn'] for item in builds_data]
-            )
-        )
-    )
 
-    return graph_bokeh.figure_as_html(builds_data, nodes, title="last 5000 builds")
+    return graph_bokeh.figure_as_html(builds, title="last 5000 builds")
