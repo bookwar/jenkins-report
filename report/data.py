@@ -8,7 +8,7 @@ def get_builds(dbname, offset=0, limit=20, query=None, **kwargs):
     db = dataset.connect('sqlite:///%s' % dbname)
 
     if query:
-        return db.query(query, _limit=limit, _offset=offset, order_by='-timestamp', **kwargs)
+        return db.query(query, _limit=limit, _offset=offset, **kwargs)
 
     table = db.load_table('builds')
     builds = table.find(_limit=limit, _offset=offset, order_by='-timestamp', **kwargs)
@@ -37,3 +37,17 @@ def get_last_builds(db):
             pass
 
     return last_builds
+
+def get_data_for_job(dbname, job):
+
+    query = 'select * from builds where name = "%s" order by timestamp desc' % job
+    builds = list(get_builds(dbname, query=query, limit=100))
+
+    return (graph_bokeh.figure_as_html(builds, title="Job: %s" % job), builds)
+
+def get_data_for_jobs(dbname, string):
+
+    query = "select * from builds where instr(name, '%s') > 0 order by timestamp desc" % string
+    builds = list(get_builds(dbname, query=query, limit=100))
+
+    return (graph_bokeh.figure_as_html(builds, title="Jobs match string: %s" % string), builds)

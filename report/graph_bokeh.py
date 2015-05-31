@@ -12,18 +12,15 @@ logger = logging.getLogger(__name__)
 
 def get_build_color(build_data):
 
-    result = build_data['result']
+    color_map = {
+        'SUCCESS': 'green',
+        'UNSTABLE': 'gold',
+        'FAILURE': 'red',
+        'ABORTED': 'gray',
+        'other': 'blue',
+    }
 
-    if result == 'SUCCESS':
-        return 'green'
-    elif result == 'FAILURE':
-        return 'red'
-    elif result == 'UNSTABLE':
-        return 'gold'
-    elif result == 'ABORTED':
-        return 'gray'
-    else:
-        return 'blue'
+    return color_map.get(build_data['result'], color_map['other'])
 
 def figure_as_html(builds_data, nodes=None, title=None, with_labels=False):
     ''' For every build in builds_data draw rectangle with data:
@@ -92,7 +89,8 @@ def figure_as_html(builds_data, nodes=None, title=None, with_labels=False):
     p = figure(x_axis_type="datetime", y_range=nodes, width=900,
                tools=TOOLS,
                title=title,
-               toolbar_location="below"
+               toolbar_location="below",
+               height=max(min(len(nodes)* 40, 800),100),
     )
 
     hover = p.select(dict(type=HoverTool))

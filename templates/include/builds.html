@@ -4,6 +4,7 @@
     <th>Timestamp</th>
     <th>Name</th>
     <th>Number</th>
+    <th>Duration</th>
     <th>Node</th>
     <th>Result</th>
     <th>Link</th>
@@ -13,8 +14,9 @@
     <td>{{build.timestamp|ts_to_time}}</td>
     <td>{{build.name}}</td>
     <td>{{build.number}}</td>
+    <td>{{build.duration|duration_to_td}}</td>
     <td>{{build.builtOn}}</td>
-    <td>{{build.result}}</td>
+    <td><span class="label label-{{build.result|result_to_css}}">{{build.result}}</span></td>
     <td>(<a href="{{build.url}}">link</a>)</td>
   </tr>
   {% endfor %}
