@@ -44,7 +44,7 @@ def fetch_builds_data(jenkins_url):
         params=params
     )
     builds_data = json.loads(r.text)["jobs"]
-    logger.info("Fetched %d builds" % len(builds_data))
+    logger.info("Fetched %d job entries" % len(builds_data))
     return builds_data
 
 def store_builds_data(builds_data, dbname):
@@ -67,17 +67,23 @@ def store_builds_data(builds_data, dbname):
     db = dataset.connect('sqlite:///%s' % dbname)
 
     table = db.get_table('builds', primary_id='index')
+    last_stored_build = table.find_one(_limit=1, order_by='-timestamp')
+    if last_stored_build:
+        last_stored_build_timestamp = last_stored_build['timestamp']
+    else:
+        last_stored_build_timestamp = 0
 
+    logger.debug(last_stored_build)
+    skipped_counter = 0
     db.begin()
     for job_entry in builds_data:
         for build in job_entry['builds']:
-
-            # FIXME: Build DB is append-only, thus, for efficiency, we
-            # should process only new builds with timestamp later than
-            # the last one which alredy exists in db
-
-            build['name'] = job_entry['name']
-            table.upsert(build, ['name','number'])
+            if build['timestamp'] >= last_stored_build_timestamp:
+                build['name'] = job_entry['name']
+                table.upsert(build, ['name','number'])
+            else:
+                skipped_counter+=1
+    logger.debug("Skipped builds: %d" % skipped_counter)
     db.commit()
 
     return len(db['builds'])
