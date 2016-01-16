@@ -1,4 +1,4 @@
-# WTF
+# Jenkins Report
 
 This tool can
 
@@ -18,7 +18,7 @@ This tool can
            duration = 320450
     fullDisplayName = 389-ds-base #552
 ```
-* Use database to create interactive graph:
+* Use database to create interactive graphs:
 
      ![Screenshot](/screenshot.png?raw=true)
 
@@ -41,7 +41,7 @@ Uses [Bootstrap Flatly](https://bootswatch.com/flatly/) theme.
 ```
   $ pip install -r requirements.txt
   $ cp config.py.example config.py
-  $ python app.py
+  $ python runserver.py
 ```
 Use browser to go to http://localhost:5000/
 
@@ -55,5 +55,4 @@ Use browser to go to http://localhost:5000/
 
 * Pagination for builds
 * Query by name, by date range, by anything
-* Show builds under graph
 
