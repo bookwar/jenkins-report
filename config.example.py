@@ -32,3 +32,7 @@ KEY = "friend"
 # String shown in the top left corner
 
 PROJECT_NAME = 'Jenkins Report'
+
+LINKS = {
+  'fedora graph': '/db/fedora/graph',
+}

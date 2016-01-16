@@ -4,18 +4,42 @@ Hello
 {% endblock %}
 {% block content %}
 <div class="page-header">
-<h1>Hello</h1>
+  <h1>Hello</h1>
 </div>
 
- <ul>
-  {% for dbname, dbdata in config.DB.iteritems() %}
-    <li>{{ dbdata.description }} {% if dbdata.source.url %}(<a href="{{ dbdata.source.url }}">link</a>){% endif %} - {{ last.get(dbname)|ts_to_time }}
-      <ul>
-	<li><a href="/db/{{ dbname }}/graph">graph</a></li>
-	<li><a href="/db/{{ dbname }}/builds">builds</a></li>
-      </ul>
-    </li>
+{% if config.LINKS %}
+<h4>Quick links</h4>
+<ul>
+  {% for name, url in config.LINKS.iteritems() %}
+  <li><a href="{{ url }}">{{ name }}</a></li>
   {% endfor %}
- </ul>
+</ul>
+<hr>
+{% endif %}
 
+<h4>Supported urls <h4>
+
+<h5>Generic overview (latest 5000 builds)</h5>
+
+<pre>/db/<i>db_name</i>/graph</pre>
+
+<h5> Downstream view (usefull for "runners")</h5>
+
+<pre>/db/<i>db_name</i>/ds/<i>job</i>/<i>number</i></pre>
+
+<h5>Job view</h5>
+
+<pre>/db/<i>db_name</i>/job/<i>job_name</i></pre>
+
+<h4>Available databases</h4>
+<ul>
+  {% for dbname, dbdata in config.DB.iteritems() %}
+  <li>{{ dbdata.description }} {% if dbdata.source.url %}(<a href="{{ dbdata.source.url }}">link</a>){% endif %} - {{ last.get(dbname)|ts_to_time }}
+    <ul>
+      <li><a href="/db/{{ dbname }}/graph">graph</a></li>
+      <li><a href="/db/{{ dbname }}/builds">builds</a></li>
+    </ul>
+  </li>
+  {% endfor %}
+</ul>
 {% endblock %}
