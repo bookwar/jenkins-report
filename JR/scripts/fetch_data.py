@@ -1,7 +1,7 @@
 import json
 import requests
+import argparse
 import dataset
-
 
 def fetch_builds_data(jenkins_url):
     '''Get json data of all Jenkins builds
@@ -107,4 +107,22 @@ def update_db(dbname, source):
     return store_builds_data(builds_data, dbname)
 
 if __name__ == '__main__':
-    update_builds_db(source_file='test.data', dbname='test.db')
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--datafile',
+                        help="file with JSON source data",
+                        default=None,
+    )
+    parser.add_argument('--url',
+                        help="URL of Jenkins instance",
+                        default=None,
+    )
+    parser.add_argument('-d', '--dbname',
+                        help="Filename of the SQLite database",
+                        default='output.db'
+    )
+
+
+    args = parser.parse_args()
+
+    update_builds_db(dbname=args.dbname, source_file=args.datafile, source_url=args.url)
