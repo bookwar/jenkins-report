@@ -1,7 +1,10 @@
 import json
 import requests
 import argparse
+import logging
 import dataset
+
+logger = logging.getLogger(__name__)
 
 def fetch_builds_data(jenkins_url):
     '''Get json data of all Jenkins builds
@@ -41,7 +44,7 @@ def fetch_builds_data(jenkins_url):
         params=params
     )
     builds_data = json.loads(r.text)["jobs"]
-
+    logger.info("Fetched %d builds" % len(builds_data))
     return builds_data
 
 def store_builds_data(builds_data, dbname):
@@ -108,6 +111,9 @@ def update_db(dbname, source):
 
 if __name__ == '__main__':
 
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--datafile',
                         help="file with JSON source data",
@@ -122,7 +128,16 @@ if __name__ == '__main__':
                         default='output.db'
     )
 
+    parser.add_argument('-v', '--verbose',
+                        help="Enable debug output",
+                        action="store_true",
+    )
 
     args = parser.parse_args()
+
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.debug(args)
 
     update_builds_db(dbname=args.dbname, source_file=args.datafile, source_url=args.url)
